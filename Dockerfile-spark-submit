@@ -1,0 +1,19 @@
+FROM bitnami/spark:3.5.5-debian-12-r4
+
+
+# Copy requirements file and install Python dependencies
+COPY src/spark/requirements.in /opt/spark-apps/requirements.in
+RUN pip3 install --no-cache-dir -r /opt/spark-apps/requirements.in
+
+
+# Copy spark_consumer.py
+COPY src/spark/spark_consumer.py /opt/spark-apps/spark_consumer.py
+
+
+# Run the Spark application
+CMD ["/opt/bitnami/spark/bin/spark-submit", \
+     "--master", "spark://spark-master:7077", \
+     "--deploy-mode", "client", \
+     "--verbose", \
+     "--packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.5,org.apache.spark:spark-avro_2.12:3.5.5", \
+     "/opt/spark-apps/spark_consumer.py"]
